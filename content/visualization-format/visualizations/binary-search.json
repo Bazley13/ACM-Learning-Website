@@ -1,0 +1,41 @@
+{
+  "id": "binary-search",
+  "schemaVersion": "1.0",
+  "title": "二分查找",
+  "type": "array",
+  "category": "searching",
+  "description": "在有序数组上每次折半，通过 lo / hi / mid 三个指针定位目标。",
+  "tags": ["查找", "指针", "二分"],
+  "data": [1, 3, 5, 7, 9, 11, 13, 15],
+  "config": { "orientation": "horizontal" },
+  "init": {
+    "pointers": [
+      { "name": "lo", "index": 0 },
+      { "name": "hi", "index": 7 }
+    ]
+  },
+  "steps": [
+    {
+      "note": "目标 7。初始区间 lo=0, hi=7。",
+      "pointers": [{ "name": "lo", "index": 0 }, { "name": "hi", "index": 7 }]
+    },
+    {
+      "note": "mid = (0+7)/2 = 3，指向 7，正好命中目标！",
+      "marks": [{ "indices": [3], "color": "current", "label": "7" }],
+      "pointers": [
+        { "name": "lo", "index": 0 },
+        { "name": "hi", "index": 7 },
+        { "name": "mid", "index": 3 }
+      ]
+    },
+    {
+      "note": "data[3] == 7 == target，查找成功。",
+      "marks": [{ "indices": [3], "color": "sorted", "label": "命中" }],
+      "pointers": [
+        { "name": "lo", "index": 0 },
+        { "name": "hi", "index": 7 },
+        { "name": "mid", "index": 3 }
+      ]
+    }
+  ]
+}

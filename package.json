@@ -1,0 +1,29 @@
+{
+  "name": "dlmu-acm-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "deploy": "npm ci && npm run build && echo 'Now start with pm2'",
+    "validate:content": "tsx scripts/validate-content.ts"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.2",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "ajv": "^8.17.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}

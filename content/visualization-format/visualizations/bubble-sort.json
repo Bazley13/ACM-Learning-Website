@@ -1,0 +1,67 @@
+{
+  "id": "bubble-sort",
+  "schemaVersion": "1.0",
+  "title": "冒泡排序",
+  "type": "array",
+  "category": "sorting",
+  "description": "两两比较相邻元素，把较大/较小的冒泡到末端，重复扫描直到有序。",
+  "tags": ["排序", "交换", "入门"],
+  "data": [5, 3, 8, 1, 9, 2],
+  "init": {
+    "pointers": [
+      { "name": "i", "index": 0 },
+      { "name": "j", "index": 0 }
+    ]
+  },
+  "steps": [
+    {
+      "note": "开始：i 表示已排好的尾端边界，j 负责从左到右扫描邻居。",
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 0 }]
+    },
+    {
+      "note": "第 1 轮比较：5 与 3，5 > 3，需要交换。",
+      "marks": [{ "indices": [0, 1], "color": "compare", "label": "5 vs 3" }],
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 0 }]
+    },
+    {
+      "note": "交换 5 与 3。",
+      "swap": { "a": 0, "b": 1, "color": "swap" },
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 1 }]
+    },
+    {
+      "note": "现在比较 5 与 8，5 < 8，不动，j 继续右移。",
+      "marks": [{ "indices": [1, 2], "color": "compare", "label": "5 vs 8" }],
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 1 }]
+    },
+    {
+      "note": "比较 8 与 1，8 > 1，交换。",
+      "marks": [{ "indices": [2, 3], "color": "compare", "label": "8 vs 1" }],
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 2 }]
+    },
+    {
+      "note": "交换 8 与 1，j 继续。",
+      "swap": { "a": 2, "b": 3, "color": "swap" },
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 3 }]
+    },
+    {
+      "note": "比较 9 与 2，9 > 2，交换，这一轮 9 冒泡到末端。",
+      "marks": [{ "indices": [4, 5], "color": "compare", "label": "9 vs 2" }],
+      "pointers": [{ "name": "i", "index": 0 }, { "name": "j", "index": 4 }]
+    },
+    {
+      "note": "交换 9 与 2。",
+      "swap": { "a": 4, "b": 5, "color": "swap" },
+      "pointers": [{ "name": "i", "index": 1 }, { "name": "j", "index": 4 }]
+    },
+    {
+      "note": "第 1 轮结束，末端 9 已就位，标记为 sorted。i 右移开启下一轮。",
+      "marks": [{ "indices": [5], "color": "sorted" }],
+      "pointers": [{ "name": "i", "index": 1 }, { "name": "j", "index": 0 }]
+    },
+    {
+      "note": "（后续轮次同理，为示例这里直接跳到完成）排序完成：3, 1, 5, 2, 8, 9 已全部就位。",
+      "marks": [{ "indices": [0, 1, 2, 3, 4, 5], "color": "sorted" }],
+      "pointers": [{ "name": "i", "index": 5 }, { "name": "j", "index": 0 }]
+    }
+  ]
+}

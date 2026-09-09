@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dlmu-acm.local/schema/award.schema.json",
+  "title": "ACM 工作室 · 荣誉墙证书条目 v1.0",
+  "description": "电子荣誉墙的一条记录 = 一个 JSON 文件（条目信息，引用证书图片）。存放于 content/awards/<season>-<n>.json，证书图片放 content/awards/images/。",
+  "type": "object",
+  "required": ["id", "competition", "level", "title", "awardDate", "image"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "条目唯一标识，与文件名一致。" },
+    "competition": {
+      "type": "string",
+      "description": "比赛主办方/名称，用于按比赛筛选。建议用统一枚举名，如 ICPC / CCPC / 码蹄杯 / 蓝桥杯 / 百度之星 / PTA团体程序设计大赛 / 辽宁省程序设计大赛 等。"
+    },
+    "level": {
+      "enum": ["ICPC亚洲区域赛", "CCPC中国大学生程序设计竞赛", "国家级", "省级", "市级", "校内", "其他"],
+      "description": "赛事级别，用于荣誉墙分级展示。"
+    },
+    "title": { "type": "string", "description": "奖项名称，如『银奖』『一等奖』『金奖』。" },
+    "awardDate": { "type": "string", "format": "date", "description": "获奖日期。" },
+    "season": { "type": "string", "description": "赛季/年份（可选，用于按年份筛选），如 2024-2025。" },
+    "members": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "获奖成员名单（可选，用于按人名筛选）。"
+    },
+    "image": {
+      "type": "string",
+      "description": "证书图片路径，相对 content/awards/，如 images/2024-icpc-icpc.jpg。"
+    },
+    "note": { "type": "string", "description": "备注/战报一句话（可选）。" }
+  }
+}

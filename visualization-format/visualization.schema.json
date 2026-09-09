@@ -1,0 +1,176 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dlmu-acm.local/schema/visualization.schema.json",
+  "title": "ACM 工作室 · 算法可视化内容格式 (v1.0)",
+  "description": "一个可视化 = 一个符合本 Schema 的 JSON 文件。采用『声明式步骤帧』模型：内容作者只描述每一帧要做什么（高亮/指针/取值/交换），渲染器据此播放，不写任何渲染代码。",
+  "type": "object",
+  "required": ["id", "schemaVersion", "title", "type", "data", "steps"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "全局唯一标识。约定与文件名一致，如 bubble-sort。"
+    },
+    "schemaVersion": {
+      "const": "1.0",
+      "description": "本文件遵循的可视化格式规范版本。"
+    },
+    "title": { "type": "string", "minLength": 1, "description": "前台展示的名称，如『冒泡排序』。" },
+    "type": {
+      "enum": ["array", "linked-list", "tree", "graph", "board"],
+      "description": "可视化基元类型。v1.0 正式支持 array；linked-list / tree / graph / board 为保留扩展位，渲染器对应插件未实现前上传会被拒绝。"
+    },
+    "category": {
+      "type": "string",
+      "description": "前台分组用，如 sorting / searching / dp / data-structure。"
+    },
+    "description": {
+      "type": "string",
+      "description": "算法一句话介绍，显示在可视化入口卡片上。"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "自由标签，用于搜索与过滤。"
+    },
+    "data": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": ["number", "string"] },
+      "description": "初始数据。array 类型下为一条数值/字符串序列，渲染器据此渲染为柱状或列表。"
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "渲染器可选参数，如动画时长、起始状态说明等。属性以渲染器文档为准。",
+      "properties": {
+        "orientation": {
+          "enum": ["vertical", "horizontal"],
+          "description": "array 渲染方向，默认 vertical（竖向柱状图）。"
+        },
+        "defaultColor": {
+          "enum": ["compare", "current", "visited", "sorted", "swap", "error", "default"],
+          "description": "元素默认语义色，默认 default。"
+        },
+        "minValue": { "type": "number", "description": "竖向渲染时柱高的最小值映射，默认取数据最小值。" },
+        "maxValue": { "type": "number", "description": "竖向渲染时柱高的最大值映射，默认取数据最大值。" }
+      }
+    },
+    "init": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "首帧之前的一次性初始化声明，用于设置初始指针或初始标记（如 i=0, j=1）。属帧模型的便捷写法。",
+      "properties": {
+        "pointers": { "type": "array", "items": { "$ref": "#/definitions/pointer" } },
+        "marks": { "type": "array", "items": { "$ref": "#/definitions/mark" } }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "description": "按顺序播放的帧序列。播放器按帧逐步前进，可播放/暂停/步进/调速。",
+      "items": { "$ref": "#/definitions/frame" }
+    }
+  },
+  "allOf": [
+    {
+      "description": "array 类型对其 data、type、config 的额外约束。",
+      "if": { "properties": { "type": { "const": "array" } }, "required": ["type"] },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": ["number", "string"] }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "color": {
+      "enum": ["compare", "current", "visited", "sorted", "swap", "error", "default"],
+      "description": "语义色令牌，而非具体色值。渲染器把令牌映射为实际配色（含深色模式）。这样内容与配色主题解耦，换主题不用改内容。"
+    },
+    "mark": {
+      "type": "object",
+      "required": ["indices"],
+      "properties": {
+        "indices": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 },
+          "minItems": 1,
+          "description": "被标记的元素下标（0 基）。"
+        },
+        "color": { "$ref": "#/definitions/color" },
+        "label": { "type": "string", "description": "标记上叠加的文本，如比较对「5 vs 3」。" }
+      },
+      "additionalProperties": true
+    },
+    "pointer": {
+      "type": "object",
+      "required": ["name", "index"],
+      "properties": {
+        "name": { "type": "string", "description": "指针名，如 lo / hi / mid / i / j。" },
+        "index": { "type": "integer", "minimum": 0, "description": "指针指向的下标。取 -1 表示指针移出界/hidden（如二分查找未命中）。" },
+        "color": { "$ref": "#/definitions/color" },
+        "label": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "setOp": {
+      "type": "object",
+      "required": ["index", "value"],
+      "description": "将下标 index 的元素改为 value（重绘柱高/文本）。",
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "value": { "type": ["number", "string"] },
+        "color": { "$ref": "#/definitions/color" }
+      },
+      "additionalProperties": true
+    },
+    "swapOp": {
+      "type": "object",
+      "required": ["a", "b"],
+      "description": "交换下标 a 与 b 的两个元素。",
+      "properties": {
+        "a": { "type": "integer", "minimum": 0 },
+        "b": { "type": "integer", "minimum": 0 },
+        "color": { "$ref": "#/definitions/color" }
+      },
+      "additionalProperties": true
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "一帧 = 一次视觉/叙事更新。通常一帧只做一到两个操作，便于逐帧讲解。",
+      "anyOf": [
+        { "required": ["marks"] },
+        { "required": ["pointers"] },
+        { "required": ["set"] },
+        { "required": ["swap"] },
+        { "required": ["note"] }
+      ],
+      "properties": {
+        "note": { "type": "string", "description": "本帧讲解文案，播放时显示。" },
+        "marks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/mark" },
+          "description": "本帧要标记/改色的元素集合。"
+        },
+        "pointers": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pointer" },
+          "description": "本帧指针位置快照（非增量，全量覆盖当前指针）。"
+        },
+        "set": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/setOp" },
+          "description": "本帧的重赋值操作。"
+        },
+        "swap": { "$ref": "#/definitions/swapOp", "description": "本帧的交换操作。" }
+      }
+    }
+  }
+}

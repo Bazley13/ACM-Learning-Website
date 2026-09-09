@@ -1,0 +1,126 @@
+:root {
+  --bg: #0f1220;
+  --bg-soft: #171b2e;
+  --card: #1d2240;
+  --border: #2b3157;
+  --text: #e8ebff;
+  --text-dim: #9aa0c4;
+  --accent: #5b9dff;
+  --accent2: #8f6bff;
+  --green: #37d0a2;
+  --red: #ff6b7a;
+  --amber: #ffc65c;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.7;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+/* 导航 */
+.topnav {
+  position: sticky; top: 0;
+  background: rgba(15,18,32,.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+}
+.topnav .container { display: flex; align-items: center; gap: 24px; height: 60px; }
+.brand { font-weight: 700; letter-spacing: .5px; color: var(--text); }
+.brand span { color: var(--accent); }
+.topnav nav { display: flex; gap: 18px; margin-left: auto; }
+.topnav nav a { color: var(--text-dim); font-size: 15px; }
+.topnav nav a:hover { color: var(--accent); text-decoration: none; }
+
+/* 布局 */
+main { padding: 40px 0 80px; }
+.section-title { font-size: 22px; margin: 32px 0 8px; }
+.muted { color: var(--text-dim); }
+
+/* 卡片 */
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.card:hover { border-color: var(--accent); }
+.card h3 { margin: 0 0 6px; font-size: 17px; }
+.card .meta { color: var(--text-dim); font-size: 13px; margin-bottom: 8px; }
+.card p { margin: 0; color: var(--text-dim); font-size: 14px; }
+
+/* 徽章/标签 */
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 12px; background: var(--bg-soft); color: var(--text-dim);
+  border: 1px solid var(--border); margin-right: 6px;
+}
+.badge.accent { color: var(--accent); border-color: var(--accent); }
+.badge.green { color: var(--green); border-color: var(--green); }
+.badge.amber { color: var(--amber); border-color: var(--amber); }
+
+/* 按钮 */
+.btn {
+  display: inline-block; padding: 8px 16px; border-radius: 8px;
+  background: var(--accent); color: #0b0e1c; font-weight: 600;
+  border: none; cursor: pointer; font-size: 14px;
+}
+.btn:hover { opacity: .9; text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+
+/* 公告 */
+.announce { border-left: 3px solid var(--accent2); }
+.pinned { border-left-color: var(--green); }
+
+/* 荣誉墙 */
+.award-card img { width: 100%; border-radius: 8px; display: block; margin-top: 10px; }
+
+/* 可视化播放器 */
+.viz-stage {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; min-height: 260px;
+  display: flex; align-items: flex-end; justify-content: center; gap: 8px;
+}
+.bar {
+  width: 40px; background: var(--accent); border-radius: 6px 6px 0 0;
+  transition: height .25s ease, background .25s ease; min-height: 4px;
+}
+.viz-controls { display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
+.viz-note { margin-top: 16px; padding: 12px; background: var(--card); border-radius: 8px; color: var(--text-dim); }
+
+/* 实验台 */
+.lab-frame-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.panel label { display: block; margin: 10px 0 4px; font-size: 14px; color: var(--text-dim); }
+.panel input, .panel select {
+  width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--bg-soft); color: var(--text); font-size: 14px;
+}
+
+/* 表单（后台） */
+.field { margin-bottom: 16px; }
+.field label { display: block; margin-bottom: 6px; color: var(--text-dim); font-size: 14px; }
+.field input, .field textarea, .field select {
+  width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg-soft); color: var(--text); font-size: 14px; font-family: inherit;
+}
+.field textarea { min-height: 120px; }
+
+.notice { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+.notice.ok { background: rgba(55,208,162,.15); border: 1px solid var(--green); color: var(--green); }
+.notice.err { background: rgba(255,107,122,.15); border: 1px solid var(--red); color: var(--red); }

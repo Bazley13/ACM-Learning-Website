@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dlmu-acm.local/schema/app-manifest.schema.json",
+  "title": "ACM 工作室 · 实验台小程序清单 (App Manifest) v1.0",
+  "description": "实验台模式的小程序描述文件。一个实验台小程序 = 一个 ZIP（内含本清单 + 入口文件 + 依赖资源），上传后存放在 content/labs/<id>/ 并静态托管。本 Schema 只定义『接口契约』，不约束程序内部实现。",
+  "type": "object",
+  "required": ["id", "title", "category", "version", "author", "entry", "files"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "全局唯一标识，与目录名/路由一致，如 lab-fern-square。"
+    },
+    "title": { "type": "string", "minLength": 1, "description": "前台显示名。" },
+    "category": { "type": "string", "description": "前台分组，如 数值算法 / 图论 / 数学 / 数据结构。" },
+    "version": { "type": "string", "description": "语义化版本，如 1.0.0。同一 id 上传新版替换旧版。" },
+    "author": { "type": "string", "description": "作者，建议写‘某届工作室成员’，便于传火署名。" },
+    "entry": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_./-]+\\.(html|htm)$",
+      "description": "入口 HTML，相对本 ZIP 根目录，如 index.html。会在沙箱 iframe 中加载。"
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "ZIP 内其余需要托管的文件/目录，相对路径，如 [\"main.js\", \"style.css\", \"assets/\"]。禁止包含 manifest 自身之外的隐藏系统文件。"
+    },
+    "params": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/param" },
+      "description": "声明可调参数。网站据此统一渲染参数面板；可空（纯自控小程序不需要外部调参）。"
+    },
+    "samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "params": { "type": "object", "description": "与 params 的 name 对应的取值。" }
+        },
+        "additionalProperties": true
+      },
+      "description": "预置样例，一键填充参数。内容作者可提供多个有讲解价值的预设。"
+    },
+    "description": { "type": "string", "description": "实验台入口卡片上的一句话说明。" },
+    "previewImage": {
+      "type": "string",
+      "description": "可选封面图路径，相对本 ZIP 根目录。未提供则用首帧/占位图。"
+    },
+    "minHostApi": {
+      "const": "1.0",
+      "description": "要求网站至少提供 run-contract v1.0 的 host API。"
+    }
+  },
+  "definitions": {
+    "param": {
+      "type": "object",
+      "required": ["name", "label", "type"],
+      "description": "一个可调参数。网站按其 type 渲染对应控件并传给小程序。",
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$", "description": "参数名，小程序通过 window.__LAB__.getParam(name) 或消息读取。全局唯一。" },
+        "label": { "type": "string", "description": "面板上显示的中文名。" },
+        "type": {
+          "enum": ["number", "integer", "text", "select", "checkbox", "range", "color"],
+          "description": "控件类型：number=步进数字框, integer=整数框, text=文本框, select=下拉, checkbox=布尔勾选, range=滑块, color=取色器。"
+        },
+        "default": { "description": "默认值（首帧传入）。" },
+        "placeholder": { "type": "string", "description": "text 类型占位提示。" },
+        "min": { "type": "number", "description": "number/integer/range 的下限。" },
+        "max": { "type": "number", "description": "number/integer/range 的上限。" },
+        "step": { "type": "number", "description": "number/integer/range 的步长。" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "select 的候选值。"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

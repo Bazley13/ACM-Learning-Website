@@ -1,0 +1,19 @@
+{
+  "id": "lab-convert-base",
+  "title": "进制转换器",
+  "category": "基础算法",
+  "version": "1.0.0",
+  "author": "首版 · 工作室",
+  "entry": "index.html",
+  "files": ["index.html", "main.js", "style.css"],
+  "params": [
+    { "name": "value", "label": "十进制数值", "type": "number", "default": 42, "min": 0 },
+    { "name": "base", "label": "目标进制", "type": "select", "options": ["2", "8", "16"] }
+  ],
+  "samples": [
+    { "name": "42 → 二进制", "params": { "value": 42, "base": "2" } },
+    { "name": "255 → 十六进制", "params": { "value": 255, "base": "16" } }
+  ],
+  "description": "输入十进制数与目标进制，观察转换步骤（短除法）。",
+  "minHostApi": "1.0"
+}

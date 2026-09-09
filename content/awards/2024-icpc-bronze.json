@@ -1,0 +1,11 @@
+{
+  "id": "2024-icpc-bronze",
+  "competition": "ICPC",
+  "level": "ICPC亚洲区域赛",
+  "title": "铜奖",
+  "awardDate": "2024-11-03",
+  "season": "2024-2025",
+  "members": ["张三", "李四", "王五"],
+  "image": "images/2024-icpc-bronze.jpg",
+  "note": "ICPC 亚洲区域赛某赛站，三人队斩获铜奖。"
+}

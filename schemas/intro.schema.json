@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dlmu-acm.local/schema/intro.schema.json",
+  "title": "ACM 工作室 · 工作室简介 v1.0",
+  "description": "工作室简介 = 一个 JSON 文件 content/intro.json，供简介页/首页渲染。",
+  "type": "object",
+  "required": ["name", "slogan", "description", "history", "contests", "contact"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "const": "ACM工作室", "description": "工作室名称。" },
+    "slogan": { "type": "string", "description": "一句话口号，首页大标题区。" },
+    "logo": { "type": "string", "description": "logo 图片路径（可选）。" },
+    "description": { "type": "string", "description": "简介正文（Markdown，可多段）。" },
+    "focus": { "type": "string", "description": "专注方向一句话，例如『专注于算法竞赛的程序设计工作室』。" },
+    "history": {
+      "type": "array",
+      "description": "历届传承（传火时间线），每届可追加一条。",
+      "items": {
+        "type": "object",
+        "required": ["season", "summary"],
+        "properties": {
+          "season": { "type": "string", "description": "届次/年份，如 2023-2024。" },
+          "summary": { "type": "string", "description": "该届一句话成就/展望。" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "contests": {
+      "type": "array",
+      "description": "参与的比赛（按主办方），用于简介和荣誉墙联动的比赛清单。",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "enum": ["ICPC", "CCPC", "码蹄杯", "蓝桥杯", "百度之星", "PTA团体程序设计大赛", "辽宁省程序设计大赛", "其他"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "contact": {
+      "type": "object",
+      "description": "联系方式/招新入口。",
+      "properties": {
+        "email": { "type": "string" },
+        "qqGroup": { "type": "string" },
+        "banner": { "type": "string", "description": "招新信息大图（可选）。" },
+        "recruitNotice": { "type": "string", "description": "招新按钮文案（可选）。" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

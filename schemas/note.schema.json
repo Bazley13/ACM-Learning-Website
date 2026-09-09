@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dlmu-acm.local/schema/note.schema.json",
+  "title": "ACM 工作室 · 算法笔记 front-matter v1.0",
+  "description": "一篇算法笔记 = 一个 Markdown 文件（正文）+ 文件顶部 YAML front-matter（本 Schema 校验该 part）。存放于 content/notes/<topic>/<slug>.md。",
+  "type": "object",
+  "required": ["slug", "title", "category", "tags", "date", "author"],
+  "additionalProperties": true,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "URL slug，与文件名一致（不含 .md）。"
+    },
+    "title": { "type": "string", "minLength": 1, "description": "笔记标题。" },
+    "category": {
+      "type": "string",
+      "description": "专题分类，如 基础算法 / 图论 / 动态规划 / 数论 / 数据结构 / 计算几何 / 字符串。"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "自由标签，用于搜索与侧栏过滤。"
+    },
+    "date": { "type": "string", "format": "date", "description": "发布日期（YYYY-MM-DD）。" },
+    "author": { "type": "string", "description": "作者，建议写某届成员，便于传火署名。" },
+    "summary": { "type": "string", "description": "列表页的一段摘要（可选，否则截取正文开头）。" },
+    "difficulty": {
+      "enum": ["入门", "进阶", "竞赛"],
+      "description": "难度分级，用于学习路径展示（可选）。"
+    },
+    "draft": { "type": "boolean", "description": "true 表示草稿，不进列表（可选，默认 false）。" },
+    "visualizationId": {
+      "type": "string",
+      "description": "关联的可视化/实验台 id（可选），笔记页可一键跳转到对应实验台。"
+    },
+    "updated": { "type": "string", "format": "date", "description": "最后更新日期（可选）。" }
+  }
+}

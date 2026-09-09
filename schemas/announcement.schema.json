@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dlmu-acm.local/schema/announcement.schema.json",
+  "title": "ACM 工作室 · 公告 front-matter v1.0",
+  "description": "一则公告 = 一个 Markdown 文件（正文）+ YAML front-matter（本 Schema 校验）。存放于 content/announcements/YYYY-MM-DD-<slug>.md。",
+  "type": "object",
+  "required": ["slug", "title", "type", "date"],
+  "additionalProperties": true,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "URL slug。文件名建议带日期前缀避免冲突。"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "type": {
+      "enum": ["招新", "比赛报名", "获奖捷报", "训练通知", "公告", "其他"],
+      "description": "公告类型，用于首页分类展示与图标。"
+    },
+    "date": { "type": "string", "format": "date" },
+    "pinned": {
+      "type": "boolean",
+      "description": "置顶（可选，默认 false）。置顶公告排在列表最前。"
+    },
+    "expires": {
+      "type": "string",
+      "format": "date",
+      "description": "过期日期（可选）：超过此日期自动隐藏/降级，无需人手动删。"
+    },
+    "author": { "type": "string" },
+    "summary": { "type": "string", "description": "列表摘要（可选）。" }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "lab-sqrt-converge",
+  "title": "方程求根·收敛过程",
+  "category": "数值算法",
+  "version": "1.0.0",
+  "author": "2024届 · 张三",
+  "entry": "index.html",
+  "files": ["index.html", "main.js", "style.css"],
+  "params": [
+    { "name": "func", "label": "目标函数", "type": "select", "options": ["x²-2", "x³-x-2", "x·cos(x)"] },
+    { "name": "method", "label": "求根算法", "type": "select", "options": ["二分", "牛顿法", "割线法"] },
+    { "name": "a", "label": "区间左端", "type": "number", "default": 0, "min": -100, "max": 100 },
+    { "name": "b", "label": "区间右端", "type": "number", "default": 3, "min": -100, "max": 100 },
+    { "name": "iter", "label": "迭代上限", "type": "integer", "default": 20, "min": 1, "max": 100 },
+    { "name": "showDeriv", "label": "显示切线", "type": "checkbox", "default": true }
+  ],
+  "samples": [
+    { "name": "二分法 · x²-2", "params": { "func": "x²-2", "method": "二分", "a": 0, "b": 3 } },
+    { "name": "牛顿法 · x³-x-2", "params": { "func": "x³-x-2", "method": "牛顿法", "a": -1, "b": 3, "iter": 30 } }
+  ],
+  "description": "在同一坐标系里实时观察二分/牛顿/割线三种算法如何收敛到根。",
+  "minHostApi": "1.0"
+}
