@@ -8,6 +8,8 @@ import type {
   Announcement, Award, Intro, Note,
   Visualization, LabManifest,
 } from "./types";
+// 纯 URL 工具（无 node 依赖）re-export，供服务端页面使用；客户端组件请直接 import "./urls"。
+export { labEntryUrl, awardImagePublicPath } from "./urls";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
@@ -31,12 +33,23 @@ function readUtf8(abs: string): string {
   return fs.readFileSync(abs, "utf8");
 }
 
+/** 把 YAML 解析出的值里的 JS Date 强制转回 ISO 字符串（YAML 会把 2024-03-01 解析成 Date）。
+ *  这样内容作者照常写 `date: 2024-03-01` 即可，不必加引号，且渲染不会拿到 Date 对象。 */
+function normalizeDates<T>(data: Record<string, unknown>): T {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(data)) {
+    if (v instanceof Date) out[k] = v.toISOString();
+    else out[k] = v;
+  }
+  return out as T;
+}
+
 /** 解析 YAML front-matter + 正文，支持 @types 泛型 */
 function parseFrontMatter<T>(relPath: string): T & { body: string } {
   const abs = path.join(CONTENT_ROOT, relPath);
   const raw = readUtf8(abs);
   const { data, content } = matter(raw);
-  return { ...(data as T), body: content };
+  return { ...normalizeDates<T>(data), body: content };
 }
 
 // ---------- 公告 ----------
@@ -93,13 +106,6 @@ export function getAwardCompetitions(): string[] {
   return [...new Set(getAllAwards().map((a) => a.competition))];
 }
 
-/** 荣誉墙图片的公开路径（content/awards/images/xxx -> /awards-assets/xxx） */
-export function awardImagePublicPath(rel: string): string {
-  // rel 形如 "images/xxx.jpg"
-  const base = path.basename(rel);
-  return `/awards-assets/${base}`;
-}
-
 // ---------- 简介 ----------
 export function getIntro(): Intro {
   const raw = readUtf8(path.join(CONTENT_ROOT, "intro.json"));
@@ -137,9 +143,4 @@ export function getAllLabs(): { id: string; manifest: LabManifest }[] {
 
 export function getLabById(id: string): { id: string; manifest: LabManifest } | undefined {
   return getAllLabs().find((l) => l.id === id);
-}
-
-/** 实验台入口 HTML 的公开 URL */
-export function labEntryUrl(id: string, entry: string): string {
-  return `/lab-assets/${id}/${entry}`;
 }

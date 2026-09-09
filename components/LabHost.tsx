@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { LabManifest, LabParam } from "@/lib/content/types";
-import { labEntryUrl } from "@/lib/content/loader";
+import { labEntryUrl } from "@/lib/content/urls";
 
 /**
  * 实验台宿主组件。

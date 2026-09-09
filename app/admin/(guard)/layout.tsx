@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { validateSessionToken, SESSION_COOKIE } from "@/lib/auth";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+// 路由组 (guard)：只有放在这里的受保护页面会经过本守卫。
+// /admin/login 单独在路由组外，因此未登录用户也能访问，不受本布局重定向影响。
+export default function AdminGuardLayout({ children }: { children: React.ReactNode }) {
   const token = cookies().get(SESSION_COOKIE)?.value;
   const authed = token ? validateSessionToken(token) : false;
   if (!authed) redirect("/admin/login");

@@ -16,6 +16,9 @@
 # local env
 .env*.local
 
+# npm local cache (if redirected into workspace)
+/.npmcache
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
