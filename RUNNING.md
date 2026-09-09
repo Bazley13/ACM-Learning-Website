@@ -138,3 +138,82 @@ pm2 save && pm2 startup   # 重启机器后自动拉起
 | 实验台白屏/按钮无反应 | 没注册 `__LAB__.onRun/onReset`；详见 `RUNNING-CONTRACT.md`（即 `visualization-format/RUN-CONTRACT.md`） |
 | 服务连不上 | pm2 是否 running；端口 3000 / 443 是否被 Caddy 正确转发 |
 | 编码乱码 | 文件必须 UTF-8；Windows 下读取务必指定 `-Encoding UTF8` |
+
+---
+
+## 8. Git 日常命令速查（交接必会）
+
+> "内容即文件、可交接"的载体就是 Git。每一届接手第一件事：`git clone` 把仓库拉下来 → 内容与代码全在手上。日常改动习惯性 commit + push，留历史、可回滚。
+
+### 8.1 首次初始化 + 第一次提交
+
+```powershell
+cd "D:\大连民族大学\ACM工作室\DLNU-ACM算法学习"
+git init                                # 1. 初始化仓库
+git config user.name "你的GitHub用户名"  # 2. 配身份（当前仓库，不带 --global）
+git config user.email "你的GitHub注册邮箱"
+git add .                               # 3. 加入暂存区
+git status                              # 4. （可选）查看待提交内容
+git commit -m "初始提交：ACM工作室官网第一版"  # 5. 第一次提交
+```
+
+### 8.2 推送到 GitHub
+
+**路线 A（推荐，VSCode GUI，自动建远端仓库）：**
+1. 在 VSCode 打开本项目 → `Ctrl + Shift + G` 打开源代码管理。
+2. 点顶部的 **「发布到 GitHub」**。
+3. 选仓库名；**建议勾选 Private（私有）**。
+4. 完成后自动推送，得到远端仓库链接。
+
+**路线 B（命令行，可精确控制仓库归属）：**
+1. 浏览器 GitHub → `+` → New repository → 填名 → **勾 Private** → **别勾** README/.gitignore/license → Create。
+2. 终端连接并推送：
+```powershell
+git remote add origin https://github.com/<用户名>/<仓库名>.git
+git branch -M main
+git push -u origin main
+```
+
+### 8.3 日常"改一点，存一点"（每天都要用）
+
+```powershell
+git add .                       # 暂存所有改动
+git commit -m "说明这次改了什么"   # 本地提交
+git push                        # 推到 GitHub
+```
+
+> 对应 VSCode GUI：源代码管理面板 → 文件点 `+` 暂存 → 顶部输提交信息 → ✓ 提交 → `...` → 推送。
+
+### 8.4 接手别人 / 下一届的代码
+
+```powershell
+git clone <仓库URL> <本地目录名>
+cd <本地目录名>
+npm install
+npm run dev
+```
+
+### 8.5 回滚（改坏了不怕）
+
+```powershell
+git log --oneline            # 查看提交历史
+git revert <commit哈希>       # 撤销某次提交（保留历史，推荐）
+# 或：git reset --hard <commit哈希>   # 彻底回退到某次（慎用，会丢之后的改动）
+```
+
+### 8.6 常见坑速查
+
+| 情况 | 处理 |
+|------|------|
+| "Please tell me who you are" | 没配身份，重跑 8.1 第 2、3 步 |
+| "src refspec main does not match any" | 还没提交；先 commit 再 push |
+| "remote origin already exists" | 先 `git remote remove origin` 再重来 |
+| push 要密码但账号密码不行 | 用 **Personal Access Token**（GitHub 已停用密码 push） |
+| 想撤销 git init | 删隐藏目录 `.git`：`rmdir /s .git` |
+
+### 8.7 交接时给下一届的 Git 提示
+
+- 先 `git clone` **再** `npm install`，不要反着来。
+- 内容改动（笔记/公告/证书/可视化）也走 commit，它是有版本的内容资产。
+- 服务器部署用同一仓库的不同副本：服务器 `git pull` 拉最新 → 重建/重启（见第 5 节）。
+- 环境变量（管理员密码等）永远不要 commit 进仓库，用 `.env.local`（已在 `.gitignore` 排除）。
