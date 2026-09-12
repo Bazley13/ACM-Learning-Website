@@ -7,6 +7,7 @@ import matter from "gray-matter";
 import type {
   Announcement, Award, Intro, Note,
   Visualization, LabManifest,
+  ResourceCategory, ResourceData,
 } from "./types";
 // 纯 URL 工具（无 node 依赖）re-export，供服务端页面使用；客户端组件请直接 import "./urls"。
 export { labEntryUrl, awardImagePublicPath } from "./urls";
@@ -88,10 +89,15 @@ export function getNoteCategories(): { name: string; count: number }[] {
 }
 
 export function getNoteBySlug(slug: string): Note | undefined {
-  const file = listFiles("notes").find(
-    (f) => f.endsWith(".md") && path.basename(f, ".md") === slug
-  );
-  return file ? parseFrontMatter<Note>(file) : undefined;
+  const files = listFiles("notes").filter((f) => f.endsWith(".md"));
+  // 优先按 front-matter 里的 slug 精确匹配（文件名可与 slug 不同，如中文文件名）
+  for (const f of files) {
+    const n = parseFrontMatter<Note>(f);
+    if (n.slug === slug) return n;
+  }
+  // 回退：按文件名（去掉 .md）匹配
+  const byName = files.find((f) => path.basename(f, ".md") === slug);
+  return byName ? parseFrontMatter<Note>(byName) : undefined;
 }
 
 // ---------- 荣誉墙 ----------
@@ -110,6 +116,28 @@ export function getAwardCompetitions(): string[] {
 export function getIntro(): Intro {
   const raw = readUtf8(path.join(CONTENT_ROOT, "intro.json"));
   return JSON.parse(raw) as Intro;
+}
+
+// ---------- 首屏照片轮播 ----------
+export interface Photo {
+  id: string;
+  title: string;
+  caption?: string;
+  image?: string;
+  emoji?: string;
+  accent?: string;
+}
+export function getAllPhotos(): Photo[] {
+  const raw = readUtf8(path.join(CONTENT_ROOT, "photos.json"));
+  const data = JSON.parse(raw) as { photos?: Photo[] };
+  return data.photos ?? [];
+}
+
+// ---------- 资源推荐 ----------
+export function getAllResources(): ResourceCategory[] {
+  const raw = readUtf8(path.join(CONTENT_ROOT, "resources.json"));
+  const data = JSON.parse(raw) as ResourceData;
+  return data.categories ?? [];
 }
 
 // ---------- 简易档可视化 ----------

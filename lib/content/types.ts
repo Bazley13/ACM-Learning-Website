@@ -10,7 +10,7 @@ export interface Note {
   date: string;
   author: string;
   summary?: string;
-  difficulty?: "入门" | "进阶" | "竞赛";
+  difficulty?: "入门" | "进阶" | "登峰";
   draft?: boolean;
   visualizationId?: string;
   updated?: string;
@@ -42,6 +42,27 @@ export interface Award {
   members?: string[];
   image: string;
   note?: string;
+}
+
+/** 资源推荐条目（配合 content/resources.json） */
+export interface ResourceItem {
+  name: string;
+  url: string;
+  desc?: string;
+  /** 图标 key，映射到 lucide/react-icons（见 ResourceGrid） */
+  icon: string;
+  tags?: string[];
+}
+export interface ResourceCategory {
+  id: string;
+  name: string;
+  /** 语义色 key（ac/highlight/tle/primary…），驱动圆标颜色 */
+  color: string;
+  description?: string;
+  items: ResourceItem[];
+}
+export interface ResourceData {
+  categories: ResourceCategory[];
 }
 
 /** 工作室简介（配合 schemas/intro.schema.json） */

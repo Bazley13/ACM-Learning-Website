@@ -146,3 +146,39 @@ function extractZip(zipPath: string, dest: string) {
   // 解包到解压目录；系统 tar 支持 zip。设置工作目录，避免绝对路径写出。
   execFileSync("tar", ["-xf", zipPath, "-C", dest], { stdio: "pipe" });
 }
+
+/** GET：列出全部实验台（遍历 content/visualization-format/labs 下各目录的 manifest.json）。 */
+export async function GET(req: NextRequest) {
+  if (!isAuthed(req)) return NextResponse.json({ ok: false, errors: ["未登录"] }, { status: 401 });
+  const root = path.join(process.cwd(), "content", "visualization-format", "labs");
+  const items: Record<string, unknown>[] = [];
+  if (fs.existsSync(root)) {
+    for (const id of fs.readdirSync(root)) {
+      const mf = path.join(root, id, "manifest.json");
+      if (!fs.existsSync(mf)) continue;
+      try {
+        items.push({ id, manifest: JSON.parse(fs.readFileSync(mf, "utf8")) });
+      } catch {
+        /* skip */
+      }
+    }
+  }
+  return NextResponse.json({ ok: true, items });
+}
+
+/** DELETE ?id= —— 删除实验台目录并自动 git 提交。 */
+export async function DELETE(req: NextRequest) {
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) return NextResponse.json({ ok: false, errors: ["缺少 id"] }, { status: 400 });
+  if (!isAuthed(req)) return NextResponse.json({ ok: false, errors: ["未登录"] }, { status: 401 });
+  const dir = path.join(process.cwd(), "content", "visualization-format", "labs", id);
+  if (!fs.existsSync(dir)) return NextResponse.json({ ok: false, errors: ["实验台不存在"] }, { status: 404 });
+  try {
+    fs.rmSync(dir, { recursive: true, force: true });
+  } catch {
+    return NextResponse.json({ ok: false, errors: ["删除失败"] }, { status: 500 });
+  }
+  const rel = `content/visualization-format/labs/${id}`;
+  markChanged([rel]);
+  return NextResponse.json({ ok: true, detail: (await commitContent(`删除实验台: ${id}`)).detail });
+}

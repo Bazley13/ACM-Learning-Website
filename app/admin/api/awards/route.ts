@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeContent, isAuthed } from "@/lib/admin-guard";
-import { markChanged } from "@/lib/git";
+import { markChanged, commitContent } from "@/lib/git";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -48,4 +48,42 @@ export async function POST(req: NextRequest) {
   });
   if (imageRel) markChanged([`content/awards/${id}.json`, `content/awards/images/${path.basename(imageRel)}`]);
   return NextResponse.json(res, { status: res.ok ? 200 : 400 });
+}
+
+/** GET：列出全部已提交荣誉（content/awards/*.json），供后台查看/编辑/删除。 */
+export async function GET(req: NextRequest) {
+  if (!isAuthed(req)) return NextResponse.json({ ok: false, errors: ["未登录"] }, { status: 401 });
+  const dir = path.join(process.cwd(), "content", "awards");
+  const items: Record<string, unknown>[] = [];
+  if (fs.existsSync(dir)) {
+    for (const f of fs.readdirSync(dir)) {
+      if (!f.endsWith(".json")) continue;
+      try {
+        items.push(JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+      } catch {
+        /* skip corrupt */
+      }
+    }
+  }
+  items.sort((a, b) =>
+    String((b as { awardDate?: string }).awardDate ?? "").localeCompare(String((a as { awardDate?: string }).awardDate ?? ""))
+  );
+  return NextResponse.json({ ok: true, items });
+}
+
+/** DELETE ?id= —— 删除对应荣誉文件并自动 git 提交。 */
+export async function DELETE(req: NextRequest) {
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) return NextResponse.json({ ok: false, errors: ["缺少 id"] }, { status: 400 });
+  if (!isAuthed(req)) return NextResponse.json({ ok: false, errors: ["未登录"] }, { status: 401 });
+  const rel = `content/awards/${id}.json`;
+  const file = path.join(process.cwd(), rel);
+  if (!fs.existsSync(file)) return NextResponse.json({ ok: false, errors: ["荣誉不存在"] }, { status: 404 });
+  try {
+    fs.unlinkSync(file);
+  } catch {
+    return NextResponse.json({ ok: false, errors: ["删除失败"] }, { status: 500 });
+  }
+  markChanged([rel]);
+  return NextResponse.json({ ok: true, detail: (await commitContent(`删除荣誉: ${id}`)).detail });
 }

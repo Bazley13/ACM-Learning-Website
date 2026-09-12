@@ -1,7 +1,8 @@
-# DLNU-ACM 工作室官网 · 底层架构总纲 v1.0
+# DLNU-ACM 工作室官网 · 底层架构总纲 v2.0
 
 > 本文档是整个网站**可持续开发性**的根基。它不描述"这一届做出了什么"，而是定义"任何一届都能在其上安全地新增功能而不破坏已有内容"的**契约**。
-> 阅读顺序：本文档（总纲）→ `content/` 目录结构 → 各内容格式规范（`notes`/`announcements`/`awards`/`visualization-format`）→ `RUNNING.md`（交接手册）。
+> 阅读顺序：本文档（总纲）→ `content/` 目录结构 → 各内容格式规范（`notes`/`announcements`/`awards`/`resources`/`photos`/`visualization-format`）→ `RUNNING.md`（交接手册）。
+> 版本现状：**v2.0 为当前交接版**；v1→v2 的落地明细见 `CHANGELOG.md`。
 
 ---
 
@@ -44,30 +45,34 @@
 DLNU-ACM算法学习/
 ├── ARCHITECTURE.md            # 本文档（架构总纲）
 ├── RUNNING.md                 # 交接手册：如何跑起来/如何部署/如何加模块
+├── CHANGELOG.md               # 版本里程碑（v1 → v2）
+├── UI-设计方案.md             # 界面/交互蓝图（v2 已对齐实现）
 ├── content/                   # ★ 内容即资产：唯一的数据来源（data）层
 │   ├── intro.json             #   工作室简介（结构化）
 │   ├── announcements/         #   公告（Markdown + front-matter）
 │   ├── notes/                 #   算法笔记（Markdown + front-matter）
 │   │   └── <topic>/           #     （可按专题分子目录）
 │   ├── awards/                #   荣誉墙
-│   │   ├── 2024-icpc.json     #     证书条目（结构化，引用图片）
+│   │   ├── <id>.json          #     证书条目（结构化，引用图片）
 │   │   └── images/            #     证书图片
+│   ├── resources.json         #   资源推荐（洛谷/牛客等，categories 数组）
+│   ├── photos.json            #   首页照片轮播（比赛·日常，photos 数组）
 │   └── visualization-format/  #   可视化/实验台（已建，见其 README）
 │       ├── visualizations/    #     简易档：*.json
 │       └── labs/              #     实验台档：<id>/
-├── src/                       # 代码（logic）层：与 content 解耦
-│   ├── app/                   #   Next.js 路由（含 /admin）
-│   ├── components/            #   复用组件
-│   ├── content/               #   读取 content/ 并把文件转成类型化数据的 loader
-│   ├── lib/                   #   工具（markdown 渲染、schema 校验、鉴权）
-│   └── types/                 #   TS 类型，与内容 schema 一一对应
+├── app/                       # ★ 代码（logic）层：Next.js 路由（含 /admin 与 /admin/api/*）
+│   ├── (public)/              #   前台页面
+│   └── admin/                 #   后台页面 + 写 content/ 的 API 路由
+├── components/                #   复用组件（SiteNav/Slide3D/ParticleText/MDEditor 等）
+├── lib/                       #   工具：鉴权、schema 校验、git 提交、content loader
 ├── schemas/                   # 内容格式的 JSON Schema（校验与"格式即规范"）
 │   ├── note.schema.json
 │   ├── announcement.schema.json
 │   ├── award.schema.json
 │   ├── intro.schema.json
-│   └── (visualization-format 已内置自己的 schema)
-├── scripts/                   # 运维/自动化脚本
+│   └── (resources/photos 为结构式文件，无独立 schema；visualization-format 已内置自己的 schema)
+├── scripts/                   # 运维/自动化脚本（validate-content 等）
+├── public/                    # 静态资产（含后台 /uploads/ 上传图、证书原图）
 └── .gitignore                 # 排除 node_modules、运行态数据库等
 ```
 
@@ -91,13 +96,15 @@ DLNU-ACM算法学习/
 
 ## 4. 四大核心功能的落地（在架构中的位置）
 
-| 功能 | 数据层（content/） | 代码层（src/） | 后台（/admin） |
+| 功能 | 数据层（content/） | 代码层（app/） | 后台（/admin） |
 |------|------------------|--------------|----------------|
-| 工作室简介 | `intro.json` | 简介页组件 | 编辑简介表单 |
-| 笔记 | `notes/**/*.md`（含 front-matter） | 笔记列表/详情/分类/搜索页 | Markdown 编辑器（写入文件） |
-| 公告 | `announcements/*.md` | 首页公告栏/列表/置顶/归档 | 公告发布表单 |
-| 荣誉墙 | `awards/*.json` + images | 证书墙（按赛季/主办方分类） | 证书上传（图片+条目信息） |
-| 可视化（两档） | `visualization-format/` | 播放页/实验台页面 | ZIP 上传 / JSON 上传 + 校验 |
+| 工作室简介 | `intro.json` | 简介组件 | 编辑简介表单（可提交，schema 已放宽比赛名） |
+| 笔记 | `notes/<分类>/*.md` | 笔记列表/详情/分类/搜索 | 内置 Markdown 编辑器 + 查看/编辑/删除 + zip 上传 |
+| 公告 | `announcements/*.md` | 首页公告栏/列表/置顶/归档 | 发布/查看/编辑/删除 |
+| 荣誉墙 | `awards/*.json` + images | 证书墙 | 查看/编辑(保留原图)/删除 + 证书上传 |
+| 资源推荐 | `resources.json` | 资源页（洛谷/牛客图标） | 友好表单编辑器（增删分类/条目） |
+| 首页照片 | `photos.json` + `public/uploads` | 首页第三屏照片轮播 | 表单编辑 + 图片上传 |
+| 可视化（两档） | `visualization-format/` | 播放页/实验台页面 | 简易演示 上传/编辑/删除 + 实验台 ZIP 上传/删除 |
 
 后台统一做一件事：**把管理员的输入写成合规的 `content/` 文件**（并自动校验 + 可选 Git 提交）。这样"管理员上传"与"内容即文件、可版本化"两全。
 
@@ -112,19 +119,20 @@ DLNU-ACM算法学习/
 
 ---
 
-## 6. 路由规划（首版）
+## 6. 路由规划（v2 现状）（首版）
 
 ```
-/                 首页（简介 + 置顶公告 + 最新笔记 + 荣誉墙入口)
+/                 首页（三屏滚动：Hero → 简介/公告 → ACM 粒子 + 照片轮播）
 /notes            笔记列表（分类/标签/搜索）
 /notes/[slug]     笔记详情
 /announcements    公告列表
-/awards           荣誉墙（按赛季/主办方/成员筛选）
+/awards           荣誉墙
+/resources        资源推荐（洛谷/牛客等）
 /visualization    可视化列表（两档混合展示）
 /visualization/[id]    简易档播放页
 /lab/[id]         实验台页（沙箱 iframe + 参数面板）
-/intro/about      工作室简介（或并入首页）
-/admin/...        后台（笔记/公告/证书/可视化上传）
+/about            工作室简介/关于我们
+/admin/...        后台（笔记/公告/证书/简介/资源推荐/照片/可视化 管理）
 ```
 
 ---
@@ -143,11 +151,11 @@ DLNU-ACM算法学习/
 
 ---
 
-## 8. 首版本范围界定（赶在招新前）
+## 8. 版本范围界定（v2 现状）（赶在招新前）
 
-**必做**：简介页、笔记（列表+详情+分类+搜索）、公告栏（置顶/归档）、荣誉墙（分类展示+大图）、可视化（简易档播放 + 实验台沙箱页 + 两个档的 Schema 校验后台上传）、单管理员登录、部署上线。
+**v2 已完成**：单管理员后台完整 CRUD（公告/简介/荣誉墙/笔记/资源推荐/照片轮播/可视化+实验台）、内置 Markdown 编辑器（自包含实现，文字恒可见）+ 图片上传、后台保存即自动 Git 提交、首页三屏滚动（Hero → 简介→ ACM 粒子+ParticleText + 照片轮播）、二/三屏蓝·黄·红动效背景、上下屏立体翻页感。
 
-**后置（招新后迭代）**：成员登录/个人页、题库/做题记录、评论互动、访问量统计、更细的权限。
+**后置（下一届迭代）**：成员登录/个人页、题库/做题记录、评论互动、访问量统计、更细的权限。
 
 ---
 
@@ -161,14 +169,17 @@ DLNU-ACM算法学习/
 
 ## 10. 演进路线图
 
-1. **v0（本轮）**：架构总纲 + 内容 schema + 目录树（本文档及各 schema）。
+1. **v0（起步）**：架构总纲 + 内容 schema + 目录树（本文档及各 schema）。
 2. **v1（首版，招新前）**：可运行的壳 + 四大功能最小闭环 + 后台上传 + 部署 + `RUNNING.md` 交接手册。
-3. **v2+（每年迭代）**：新一届按第 7 节条款加功能；契约只增不减。
+3. **v2（当前交接版）**：后台从「内容即文件」扩展为完整 CRUD、内置 Markdown 编辑器 + 图片上传、后台保存自动 Git 提交、首页三屏滚动定稿（ACM 粒子、蓝黄红动效背景、立体翻页感）；已交付。变更明细见 `CHANGELOG.md`。
+4. **v3+（每年迭代）**：新一届按第 7 节条款加功能；契约只增不减。
 
 ---
 
-## 11. 待你确认
+## 11. 待你确认（v2 已定的结论）
 
-- **技术栈**：Next.js + TypeScript 是否认可（还是更想要 Astro / 别的）？
-- **后台鉴权**：首版做"单管理员账号"是否够？还是要"管理员/成员"两级？
-- **内容即文件 + 后台自动 commit** 这个结合方式你是否接受？
+以下三点在 v2 已落地并被接受，留给下一届的是**扩展而非推翻**：
+
+- **技术栈**：Next.js + TypeScript 已定（v2 全站基于此）。
+- **后台鉴权**：v2 采用**单管理员账号**；下一届如需"管理员/成员"两级，按第 7 节条款新增，不改既有接口。
+- **内容即文件 + 后台自动 commit**：v2 已实现「后台保存即自动 Git 提交」，下一届继续沿用。

@@ -26,7 +26,7 @@
     "author": { "type": "string", "description": "作者，建议写某届成员，便于传火署名。" },
     "summary": { "type": "string", "description": "列表页的一段摘要（可选，否则截取正文开头）。" },
     "difficulty": {
-      "enum": ["入门", "进阶", "竞赛"],
+      "enum": ["入门", "进阶", "登峰"],
       "description": "难度分级，用于学习路径展示（可选）。"
     },
     "draft": { "type": "boolean", "description": "true 表示草稿，不进列表（可选，默认 false）。" },

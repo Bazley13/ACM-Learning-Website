@@ -12,6 +12,8 @@ const ASSET_PREFIXES = {
   "/awards-assets/": path.join(CONTENT_ROOT, "awards", "images"),
   // /lab-assets/<id>/<file>     -> content/visualization-format/labs/<id>/<file>
   "/lab-assets/": path.join(CONTENT_ROOT, "visualization-format", "labs"),
+  // /notes-assets/<cat>/images/x -> content/notes/<cat>/images/x
+  "/notes-assets/": path.join(CONTENT_ROOT, "notes"),
 } as const;
 
 /**

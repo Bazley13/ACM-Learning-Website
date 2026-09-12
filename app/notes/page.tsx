@@ -1,42 +1,29 @@
-import Link from "next/link";
 import { getAllNotes, getNoteCategories } from "@/lib/content/loader";
+import NoteBrowser from "@/components/NoteBrowser";
 
 export default function NotesListPage() {
-  const notes = getAllNotes();
+  const all = getAllNotes();
   const cats = getNoteCategories();
+  const notes = all.map((n) => ({
+    slug: n.slug,
+    title: n.title,
+    category: n.category,
+    tags: n.tags,
+    date: n.date,
+    author: n.author,
+    summary: n.summary,
+    difficulty: n.difficulty,
+  }));
 
   return (
     <div>
-      <h1>算法笔记</h1>
-      <p className="muted">工作室成员沉淀的专题笔记，按分类整理。</p>
+      <h1 className="section-title" style={{ fontSize: 28 }}>
+        算法笔记
+      </h1>
+      <p className="muted">工作室成员沉淀的专题笔记，按分类整理，可搜索、筛选、排序。</p>
 
-      <section className="card" style={{ marginTop: 20 }}>
-        {cats.map((c) => (
-          <span key={c.name} className="badge accent" style={{ fontSize: 14 }}>
-            {c.name} ({c.count})
-          </span>
-        ))}
-      </section>
-
-      <section style={{ marginTop: 24 }}>
-        <div className="grid grid-2">
-          {notes.map((n) => (
-            <Link key={n.slug} href={`/notes/${n.slug}`} className="card">
-              <h3>{n.title}</h3>
-              <div className="meta">
-                <span className="badge">{n.category}</span>
-                {n.difficulty && <span className="badge amber">{n.difficulty}</span>}
-                {n.date} · {n.author}
-              </div>
-              {n.summary && <p>{n.summary}</p>}
-              {n.tags.map((t) => (
-                <span key={t} className="badge">
-                  #{t}
-                </span>
-              ))}
-            </Link>
-          ))}
-        </div>
+      <section style={{ marginTop: 16 }}>
+        <NoteBrowser notes={notes} categories={cats.map((c) => c.name)} />
       </section>
     </div>
   );

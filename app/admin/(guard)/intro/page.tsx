@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import MdEditorField from "@/components/admin/MdEditorField";
 
 export default function AdminIntroPage() {
   const [form, setForm] = useState({
@@ -84,8 +85,8 @@ export default function AdminIntroPage() {
           <input value={form.focus} onChange={(e) => setForm((f) => ({ ...f, focus: e.target.value }))} />
         </div>
         <div className="field">
-          <label>简介正文（Markdown）</label>
-          <textarea style={{ minHeight: 180 }} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+          <label>简介正文（内置 Markdown 编辑器，可直接插入图片）</label>
+          <MdEditorField value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} height={220} />
         </div>
         <div className="field">
           <label>历届传承（每行：届次| 一句话，如 2023-2024| 首获ICPC铜奖）</label>

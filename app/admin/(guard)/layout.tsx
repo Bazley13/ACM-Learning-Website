@@ -19,6 +19,9 @@ export default function AdminGuardLayout({ children }: { children: React.ReactNo
         <Link href="/admin/awards">荣誉墙</Link>
         <Link href="/admin/intro">简介</Link>
         <Link href="/admin/visualization">可视化/实验台</Link>
+        <Link href="/admin/resources">资源推荐</Link>
+        <Link href="/admin/photos">照片轮播</Link>
+        <Link href="/admin/feedback">笔记反馈</Link>
         <Link href="/admin/logout">退出</Link>
       </nav>
       {children}

@@ -36,3 +36,38 @@ export async function POST(req: NextRequest) {
     detail: cmt.ok ? undefined : "written but git commit failed: " + (cmt.detail ?? ""),
   });
 }
+
+/** GET：列出全部简易可视化（content/visualization-format/visualizations/*.json）。 */
+export async function GET(req: NextRequest) {
+  if (!isAuthed(req)) return NextResponse.json({ ok: false, errors: ["未登录"] }, { status: 401 });
+  const dir = path.join(process.cwd(), "content", "visualization-format", "visualizations");
+  const items: Record<string, unknown>[] = [];
+  if (fs.existsSync(dir)) {
+    for (const f of fs.readdirSync(dir)) {
+      if (!f.endsWith(".json")) continue;
+      try {
+        items.push(JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+      } catch {
+        /* skip */
+      }
+    }
+  }
+  return NextResponse.json({ ok: true, items });
+}
+
+/** DELETE ?id= —— 删除简易可视化文件并自动 git 提交。 */
+export async function DELETE(req: NextRequest) {
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) return NextResponse.json({ ok: false, errors: ["缺少 id"] }, { status: 400 });
+  if (!isAuthed(req)) return NextResponse.json({ ok: false, errors: ["未登录"] }, { status: 401 });
+  const rel = `content/visualization-format/visualizations/${id}.json`;
+  const file = path.join(process.cwd(), rel);
+  if (!fs.existsSync(file)) return NextResponse.json({ ok: false, errors: ["可视化不存在"] }, { status: 404 });
+  try {
+    fs.unlinkSync(file);
+  } catch {
+    return NextResponse.json({ ok: false, errors: ["删除失败"] }, { status: 500 });
+  }
+  markChanged([rel]);
+  return NextResponse.json({ ok: true, detail: (await commitContent(`删除可视化: ${id}`)).detail });
+}

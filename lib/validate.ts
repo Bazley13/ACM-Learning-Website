@@ -6,7 +6,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 const SCHEMA_DIR = path.join(process.cwd(), "schemas");
-const ajv = new Ajv({ allErrors: true });
+// validateFormats:false —— 我们的日期等字段就是普通字符串，不校验 format，
+// 也避免 ajv 对未注册 format（如 "date"）在编译期抛 "unknown format" 错误。
+const ajv = new Ajv({ allErrors: true, validateFormats: false });
 
 const compiled: Record<string, ReturnType<typeof ajv.compile>> = {};
 
@@ -15,7 +17,14 @@ function compile(name: string) {
     const file = path.join(SCHEMA_DIR, name + ".schema.json");
     if (!fs.existsSync(file)) throw new Error("schema not found: " + name);
     const schema = JSON.parse(fs.readFileSync(file, "utf8"));
-    compiled[name] = ajv.compile(schema);
+    try {
+      compiled[name] = ajv.compile(schema);
+    } catch (e) {
+      // 同一 $id 已在 ajv 中注册（如跨 chunk 重复加载）→ 复用已注册的 instance
+      const existing = schema.$id ? (ajv.getSchema(schema.$id) as ReturnType<typeof ajv.compile>) : undefined;
+      if (existing) compiled[name] = existing;
+      else throw e;
+    }
   }
   return compiled[name];
 }

@@ -19,19 +19,28 @@
 DLNU-ACM算法学习/
 ├── ARCHITECTURE.md       # 架构总纲（必须读）
 ├── RUNNING.md            # 本文档（交接手册）
+├── CHANGELOG.md          # 版本里程碑（v1 → v2）
+├── UI-设计方案.md        # 界面/交互设计蓝图（v2 已对齐实现）
+├── app/                  # ★ 代码层：Next.js 路由（含 /admin）
+│   ├── (public)/         #   前台页面
+│   └── admin/            #   后台 + /admin/api/* 写文件接口
+├── components/           # 复用组件（SiteNav/Slide3D/ParticleText/MD 组件等）
+├── lib/                  # 工具：鉴权、schema 校验、git、content loader
 ├── content/              # ★ 内容即资产：唯一数据源
 │   ├── intro.json        #   工作室简介
-│   ├── announcements/    #   公告
-│   ├── notes/            #   算法笔记
-│   ├── awards/           #   荣誉墙证书
+│   ├── announcements/    #   公告（*.md）
+│   ├── notes/            #   算法笔记（<分类>/<slug>.md）
+│   ├── awards/           #   荣誉墙（id.json + images/）
+│   ├── resources.json    #   资源推荐（洛谷/牛客等）
+│   ├── photos.json       #   首页照片轮播（比赛·日常）
 │   └── visualization-format/  # 可视化/实验台（含其 README）
 ├── schemas/              # 内容格式的 JSON Schema
-├── src/                  # 代码层（与 content 解耦）
-├── scripts/              # 运维脚本
+├── scripts/              # 运维脚本（validate-content 等）
+├── public/               # 静态资产（含后台 /uploads/ 上传图、证书图）
 └── (部署相关)            # 见第 5 节
 ```
 
-**铁律**：改内容 = 改 `content/` 下的文件；改功能 = 动 `src/` 并尽量新增模块，**不要改跨层的对外格式**（详见 ARCHITECTURE.md 第 7 节）。
+**铁律**：改内容 = 改 `content/` 下的文件；改功能 = 动 `app/`（页面/路由）并尽量新增模块，**不要改跨层的对外格式**（详见 ARCHITECTURE.md 第 7 节）。
 
 ---
 
@@ -60,12 +69,27 @@ DLNU-ACM算法学习/
 
 ---
 
-## 3. 后台（/admin）
+## 3. 后台（/admin）——完整 CRUD（v2）
 
-- 后台和前台在**同一个服务**里，路径 `/admin`，需登录。
-- 后台上传的本质 = **把输入写成合规的 `content/` 文件**并自动做 schema 校验 + 自动 Git 提交。
-- 权限：首版单一管理员账号；后续可按 `ARCHITECTURE.md` 扩展为管理员/成员两级。
+- 后台和前台在**同一个服务**里，路径 `/admin`，需登录（单一管理员账号）。
+- 后台一切“编辑/发布/删除”的本质 = **把输入写成合规的 `content/` 文件**，自动做 schema 校验 + **自动 Git 提交**（`lib/git.ts`）；你不用手动 commit。
+- 后台各页（导航栏可切换）：
+  | 页面 | 路由 | 能力 |
+  |------|------|------|
+  | 概览 / 登录 / 退出 | `/admin` `/admin/login` `/admin/logout` | 统计与鉴权 |
+  | 笔记 | `/admin/notes` | 内置 Markdown 编辑器 + 查看/编辑/删除 + zip 成包上传 |
+  | 公告 | `/admin/announcements` | 发布/查看已发布/编辑/删除 |
+  | 荣誉墙 | `/admin/awards` | 查看记录/编辑(保留原图)/删除 + 上传证书 |
+  | 简介 | `/admin/intro` | 简介提交（已修 schema，任意比赛名可存）+ Markdown 正文 |
+  | 可视化/实验台 | `/admin/visualization` | 简易演示上传/编辑/删除 + 实验台 ZIP 上传/查看/删除 |
+  | 资源推荐 | `/admin/resources` | 友好表单式编辑（洛谷/牛客等，不再是手写 JSON） |
+  | 照片轮播 | `/admin/photos` | 首页第三屏照片编辑 + 上传图片 |
+  | 笔记反馈 | `/admin/feedback` | 反馈查看/删除 |
+- **内置 Markdown 编辑器**：v2 换了自包含实现（`components/admin/MdEditorField.tsx`，工具条 + `marked` 实时预览 + “插入图片”）。
+  → 之前 `@uiw/react-md-editor` 在站点上打包 CSS 未生效导致“编辑框字看不见”，v2 已根治；“查看”预览同步换本地 `MDPreview`。
+- **图片上传**：`/admin/api/upload`（仅管理员）落盘 `public/uploads/`，编辑器“插入图片”自动填 `![alt](/uploads/…)`。
 - 实验台上传走完整安全流程（ZIP 解压 → manifest 校验 → 文件限制与扫描 → 静态托管），拒不合法输入。
+- **内容校验脚本**：`npm run validate:content`（scripts/validate-content.ts）可离线核对 content 是否全部合规，写内容前建议跑一遍。
 
 ---
 
@@ -79,6 +103,8 @@ DLNU-ACM算法学习/
 | 公告 | `schemas/announcement.schema.json` |
 | 荣誉墙证书 | `schemas/award.schema.json` |
 | 工作室简介 | `schemas/intro.schema.json` |
+| 资源推荐 | `content/resources.json`（结构式，无独立 schema；后端要求 `categories` 为数组） |
+| 首页照片轮播 | `content/photos.json`（结构式，无独立 schema；后端要求 `photos` 为数组） |
 | 简易可视化 | `visualization-format/visualization.schema.json` |
 | 实验台小程序 | `visualization-format/app-manifest.schema.json` + `RUN-CONTRACT.md` |
 
@@ -217,3 +243,18 @@ git revert <commit哈希>       # 撤销某次提交（保留历史，推荐）
 - 内容改动（笔记/公告/证书/可视化）也走 commit，它是有版本的内容资产。
 - 服务器部署用同一仓库的不同副本：服务器 `git pull` 拉最新 → 重建/重启（见第 5 节）。
 - 环境变量（管理员密码等）永远不要 commit 进仓库，用 `.env.local`（已在 `.gitignore` 排除）。
+
+## 交接补充（v2：首页观感 + 动画组件 + 许可提示）
+
+第三方依赖 / 组件，交接时请注意：
+
+- 依赖：`gsap`（部分 ReactBits 动画，免费版许可）、`vgpu`（AeroShards 的 WebGPU 光栅库）、`marked`（Markdown 渲染）、`lucide-react` / `react-icons`（图标）。均已写入 package.json。
+- `components/AeroShardsCanvas.tsx`：忠实移植 reactbits.dev 的 AeroShards（`resource/AeroShards.md`）；**依赖浏览器 WebGPU**。特性检测：`navigator.gpu` 可用才渲染首屏光栅，否则保留深色渐变兜底——任何环境不黑屏。
+- `components/Slide3D.tsx`：首页三屏（`.home-slides` scroll-snap）的**立体卡片翻页感**（IntersectionObserver 命中屏回正、其余后仰压暗）。
+- `components/ParticleText.tsx`：忠实移植 reactbits.dev 的 ParticleText（`resource/ParticleText.md`），用于首页第三屏左侧 **“ACM” 粒子字样**（粒子聚合成型、辉光 + 缓慢漂浮 + 鼠标推开）。密度/亮度参数已在 page.tsx 调为既定观感。
+- 全局导航为 `components/SiteNav.tsx`（solid 顶部栏，滚动隐藏），左上 `IcpcLogo`；不再是 CardNav 下拉。
+- 第二、第三屏背景为**蓝·黄·红三色动效光斑**（`globals.css` 的 `@keyframes`，`prefers-reduced-motion` 自动停用）。
+- 首页第三屏右侧照片轮播可在 `/admin/photos` 后台编辑（数据源 `content/photos.json`）。
+- ⚠ ReactBits 组件为开源（MIT 类许可，已确认可用），但 AeroShards 需 WebGPU、较重量，正式发布前请在真实 GPU 浏览器跑通一次首屏。
+
+构建：`npm run typecheck && npm run build`。

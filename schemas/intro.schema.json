@@ -33,7 +33,7 @@
         "required": ["name"],
         "properties": {
           "name": { "type": "string" },
-          "type": { "enum": ["ICPC", "CCPC", "码蹄杯", "蓝桥杯", "百度之星", "PTA团体程序设计大赛", "辽宁省程序设计大赛", "其他"] }
+          "type": { "type": "string", "description": "比赛类型（保留老值兼容，非固定枚举，避免自定义比赛名导致提交失败）" }
         },
         "additionalProperties": true
       }

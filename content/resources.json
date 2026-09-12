@@ -1,0 +1,102 @@
+{
+  "categories": [
+    {
+      "id": "oj",
+      "name": "算法竞赛网站",
+      "color": "ac",
+      "description": "主流的在线评测与比赛平台",
+      "items": [
+        {
+          "name": "Codeforces",
+          "url": "https://codeforces.com",
+          "icon": "codeforces",
+          "desc": "全球顶级算法竞赛平台，定期 Rating 比赛，题库丰富。"
+        },
+        {
+          "name": "AtCoder",
+          "url": "https://atcoder.jp",
+          "icon": "globe",
+          "desc": "日本知名竞赛平台，题目质量高、双语题面友好。"
+        },
+        {
+          "name": "牛客网",
+          "url": "https://www.nowcoder.com",
+          "icon": "nowcoder",
+          "desc": "国内竞赛与求职刷题平台，校招与比赛信息集中。"
+        },
+        {
+          "name": "HDU OJ",
+          "url": "http://acm.hdu.edu.cn",
+          "icon": "code",
+          "desc": "杭电在线评测，入门经典题库，国内老牌 OJ。"
+        }
+      ]
+    },
+    {
+      "id": "learn",
+      "name": "算法学习网站",
+      "color": "highlight",
+      "description": "系统性学习与查询资料",
+      "items": [
+        {
+          "name": "OI-Wiki",
+          "url": "https://oi-wiki.org",
+          "icon": "book",
+          "desc": "开源算法知识库，覆盖竞赛常用知识点，更新及时。"
+        },
+        {
+          "name": "洛谷",
+          "url": "https://www.luogu.com.cn",
+          "icon": "luogu",
+          "desc": "国内主流刷题与学习社区，题解与教材完善。"
+        },
+        {
+          "name": "USACO Guide",
+          "url": "https://usaco.guide",
+          "icon": "graduation",
+          "desc": "面向美国信息学奥赛的完整学习路径与训练计划。"
+        }
+      ]
+    },
+    {
+      "id": "video",
+      "name": "视频 / 讲解",
+      "color": "tle",
+      "description": "B 站与 YouTube 的优质算法讲解",
+      "items": [
+        {
+          "name": "B 站 · 算法讲解",
+          "url": "https://www.bilibili.com",
+          "icon": "bilibili",
+          "desc": "大量中文字幕算法视频，适合入门与专项突破。"
+        },
+        {
+          "name": "YouTube · 算法频道",
+          "url": "https://www.youtube.com",
+          "icon": "youtube",
+          "desc": "英文优质讲解频道（如知名竞赛频道），进阶必看。"
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "name": "工具",
+      "color": "primary",
+      "description": "可视化、排版与做题辅助工具",
+      "items": [
+        {
+          "name": "VisuAlgo",
+          "url": "https://visualgo.net",
+          "icon": "flask",
+          "desc": "可视化展示常见数据结构与算法，交互直观。"
+        },
+        {
+          "name": "LeetCode",
+          "url": "https://leetcode.cn",
+          "icon": "leetcode",
+          "desc": "算法题练习平台，分难度与专题刷题。"
+        }
+      ]
+    }
+  ]
+}
