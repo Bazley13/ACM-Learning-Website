@@ -1,0 +1,48 @@
+{
+  "description": "首页第三屏“比赛 / 日常”照片轮播。image 留空时卡片显示渐变 + emoji 占位；放入照片后填写对应的公开资产路径即可（如 /awards-assets/xxx.jpg 或 /uploads/...）。",
+  "photos": [
+    {
+      "id": "competition-icpc",
+      "title": "ICPC 区域赛",
+      "caption": "蓝桥 / ICPC 现场，队员协作解出一道难题的瞬间",
+      "emoji": "🏆",
+      "accent": "linear-gradient(135deg,#3b82f6,#2563eb)",
+      "image": "/uploads/1789227830716-photo.jpg"
+    },
+    {
+      "id": "life-training",
+      "title": "日常训练",
+      "caption": "每周线下训练赛与题单复盘",
+      "emoji": "💻",
+      "accent": "linear-gradient(135deg,#6d5ef0,#a855f7)"
+    },
+    {
+      "id": "competition-ccpc",
+      "title": "CCPC 现场",
+      "caption": "决赛现场与颁奖",
+      "emoji": "🎖️",
+      "accent": "linear-gradient(135deg,#ef4444,#f97316)"
+    },
+    {
+      "id": "life-room",
+      "title": "工作室日常",
+      "caption": "工作室的代码之夜与零食补给",
+      "emoji": "🕹️",
+      "accent": "linear-gradient(135deg,#22c55e,#16a34a)"
+    },
+    {
+      "id": "life-handover",
+      "title": "组会与纳新",
+      "caption": "算法分享会、新人招新宣讲",
+      "emoji": "🎤",
+      "accent": "linear-gradient(135deg,#eab308,#f97316)"
+    },
+    {
+      "id": "competition-ranking",
+      "title": "榜上留名",
+      "caption": "排行榜与奖杯陈列",
+      "emoji": "📈",
+      "accent": "linear-gradient(135deg,#0ea5e9,#2563eb)"
+    }
+  ]
+}
